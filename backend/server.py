@@ -24,7 +24,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI(title="Asistente de Apuestas Deportivas", description="API para análisis inteligente de apuestas deportivas")
+app = FastAPI(title="TipStars App API", description="API para análisis inteligente de apuestas deportivas")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -115,12 +115,47 @@ class MockParlayRecommendation(BaseModel):
 
 @api_router.get("/")
 async def root():
-    return {"message": "API del Asistente de Apuestas Deportivas", "status": "activo"}
+    return {"message": "TipStars App API - Análisis inteligente de apuestas deportivas", "status": "activo", "version": "1.0"}
 
 @api_router.get("/deportes")
 async def get_supported_sports():
     """Obtener lista de deportes soportados"""
     return {"deportes": SPORTS_CONFIG}
+
+@api_router.get("/deportes/conteo")
+async def get_sports_count():
+    """Obtener conteo de juegos disponibles por deporte"""
+    sports_count = {}
+    
+    async with httpx.AsyncClient() as client:
+        for sport_key, sport_config in SPORTS_CONFIG.items():
+            total_games = 0
+            for api_key in sport_config["api_keys"]:
+                try:
+                    url = f"https://api.the-odds-api.com/v4/sports/{api_key}/odds"
+                    params = {
+                        "apiKey": ODDS_API_KEY,
+                        "regions": "uk,us,eu",
+                        "markets": "h2h",
+                        "oddsFormat": "decimal"
+                    }
+                    
+                    response = await client.get(url, params=params, timeout=10)
+                    if response.status_code == 200:
+                        odds_data = response.json()
+                        total_games += len(odds_data)
+                    
+                except Exception as e:
+                    logging.warning(f"Error contando {api_key}: {str(e)}")
+                    continue
+            
+            sports_count[sport_key] = {
+                "name": sport_config["name"],
+                "emoji": sport_config["emoji"],
+                "total_games": total_games
+            }
+    
+    return {"sports_count": sports_count}
 
 @api_router.get("/odds/{sport}")
 async def get_odds_by_sport(sport: str):

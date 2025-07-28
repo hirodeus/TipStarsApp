@@ -119,7 +119,7 @@ const ApiKeyModal = ({ isOpen, onClose, onSave, currentKey }) => {
   );
 };
 
-const SportSelector = ({ selectedSport, onSportChange, loading }) => {
+const SportSelector = ({ selectedSport, onSportChange, loading, sportsCount }) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
       <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -129,27 +129,40 @@ const SportSelector = ({ selectedSport, onSportChange, loading }) => {
         </span>
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {Object.entries(SPORTS_CONFIG).map(([key, sport]) => (
-          <button
-            key={key}
-            onClick={() => onSportChange(key)}
-            disabled={loading}
-            className={`relative p-6 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-2 ${
-              selectedSport === key
-                ? `bg-gradient-to-br from-${sport.color}-400 to-${sport.color}-600 text-white shadow-2xl scale-105`
-                : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 shadow-lg"
-            } disabled:opacity-50 border-2 border-white`}
-          >
-            <div className="text-3xl mb-2 transform transition-transform hover:scale-125">{sport.emoji}</div>
-            <div className="font-bold text-sm">{sport.name}</div>
-            {selectedSport === key && (
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-white text-xs font-bold">✓</span>
+        {Object.entries(SPORTS_CONFIG).map(([key, sport]) => {
+          const gameCount = sportsCount[key]?.total_games || 0;
+          return (
+            <button
+              key={key}
+              onClick={() => onSportChange(key)}
+              disabled={loading}
+              className={`relative p-6 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-2 ${
+                selectedSport === key
+                  ? `bg-gradient-to-br from-${sport.color}-400 to-${sport.color}-600 text-white shadow-2xl scale-105`
+                  : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 shadow-lg"
+              } disabled:opacity-50 border-2 border-white`}
+            >
+              <div className="text-3xl mb-2 transform transition-transform hover:scale-125">{sport.emoji}</div>
+              <div className="font-bold text-sm">{sport.name}</div>
+              <div className={`text-xs mt-1 font-semibold ${
+                gameCount > 0 
+                  ? selectedSport === key ? 'text-white/80' : 'text-green-600'
+                  : selectedSport === key ? 'text-white/60' : 'text-gray-400'
+              }`}>
+                {gameCount} juegos {gameCount > 0 ? '🟢' : '🔴'}
               </div>
-            )}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </button>
-        ))}
+              {selectedSport === key && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xs font-bold">✓</span>
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-4 text-center text-sm text-gray-500">
+        🟢 = Juegos disponibles ahora • 🔴 = Sin juegos en este momento
       </div>
     </div>
   );
@@ -336,14 +349,130 @@ const EmptyState = ({ title, description, action, onAction }) => (
   </div>
 );
 
+const Footer = () => (
+  <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-12 mt-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Logo y descripción */}
+        <div className="col-span-1">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">⭐</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                TipStars App
+              </h3>
+            </div>
+          </div>
+          <p className="text-gray-300 text-sm leading-relaxed">
+            Análisis inteligente de apuestas deportivas con IA. 
+            Obtén las mejores recomendaciones de parlays basadas en datos en tiempo real.
+          </p>
+        </div>
+
+        {/* Características */}
+        <div className="col-span-1">
+          <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+            <span className="mr-2">🚀</span>Características
+          </h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li className="flex items-center">
+              <span className="mr-2">⚽</span>5 deportes soportados
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">🤖</span>Análisis IA opcional
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">🧮</span>Calculadora de parlays
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">📊</span>Odds en tiempo real
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">🇪🇸</span>100% en español
+            </li>
+          </ul>
+        </div>
+
+        {/* Desarrollador */}
+        <div className="col-span-1">
+          <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+            <span className="mr-2">👨‍💻</span>Desarrollador
+          </h4>
+          <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-4 border border-blue-500/20">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold">D</span>
+              </div>
+              <div>
+                <h5 className="font-bold text-white">Deus</h5>
+                <p className="text-xs text-gray-400">Full-Stack Developer</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-300 mb-3">
+              Especialista en aplicaciones de análisis deportivo y sistemas de IA.
+            </p>
+            <div className="flex space-x-2">
+              <span className="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs font-semibold">
+                React
+              </span>
+              <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-semibold">
+                FastAPI
+              </span>
+              <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs font-semibold">
+                AI/ML
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Línea divisoria */}
+      <div className="border-t border-gray-700 mt-8 pt-6">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="text-sm text-gray-400 mb-4 md:mb-0">
+            © 2025 TipStars App. Todos los derechos reservados.
+          </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-400">
+            <span className="flex items-center">
+              <span className="mr-1">⚡</span>
+              Powered by Emergent AI
+            </span>
+            <span className="flex items-center">
+              <span className="mr-1">🔒</span>
+              Uso responsable de apuestas
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
 function App() {
-  const [selectedSport, setSelectedSport] = useState('esports');
+  const [selectedSport, setSelectedSport] = useState('soccer');
   const [odds, setOdds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBets, setSelectedBets] = useState([]);
   const [showApiModal, setShowApiModal] = useState(false);
   const [userApiKey, setUserApiKey] = useState(localStorage.getItem('openai_api_key') || '');
   const [aiMode, setAiMode] = useState(false);
+  const [sportsCount, setSportsCount] = useState({});
+  const [loadingCounts, setLoadingCounts] = useState(false);
+
+  const fetchSportsCount = async () => {
+    setLoadingCounts(true);
+    try {
+      const response = await axios.get(`${API}/deportes/conteo`);
+      setSportsCount(response.data.sports_count || {});
+    } catch (error) {
+      console.error('Error obteniendo conteo de deportes:', error);
+      setSportsCount({});
+    } finally {
+      setLoadingCounts(false);
+    }
+  };
 
   const fetchOdds = async (sport = selectedSport) => {
     setLoading(true);
@@ -388,6 +517,7 @@ function App() {
   };
 
   useEffect(() => {
+    fetchSportsCount();
     fetchOdds();
     setAiMode(!!userApiKey);
   }, []);
@@ -421,7 +551,10 @@ function App() {
                 {aiMode ? '🤖 IA Activa' : '🔑 Activar IA'}
               </button>
               <button
-                onClick={() => fetchOdds()}
+                onClick={() => {
+                  fetchOdds();
+                  fetchSportsCount();
+                }}
                 disabled={loading}
                 className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:transform-none shadow-lg"
               >
@@ -437,7 +570,8 @@ function App() {
         <SportSelector 
           selectedSport={selectedSport}
           onSportChange={handleSportChange}
-          loading={loading}
+          loading={loading || loadingCounts}
+          sportsCount={sportsCount}
         />
 
         {/* Live Odds Section */}
@@ -548,6 +682,9 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
 
       {/* API Key Modal */}
       <ApiKeyModal
