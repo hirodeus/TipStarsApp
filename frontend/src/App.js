@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -7,35 +6,96 @@ const API = `${BACKEND_URL}/api`;
 
 // Sports configuration
 const SPORTS_CONFIG = {
-  soccer: { name: "Fútbol", emoji: "⚽", color: "emerald" },
-  basketball: { name: "NBA", emoji: "🏀", color: "orange" },
-  americanfootball: { name: "NFL", emoji: "🏈", color: "purple" },
-  tennis: { name: "Tenis", emoji: "🎾", color: "green" },
-  esports: { name: "Esports", emoji: "🎮", color: "blue" }
+  soccer: { name: "Fútbol", emoji: "⚽", color: "#10b981" },
+  basketball: { name: "NBA", emoji: "🏀", color: "#f97316" },
+  americanfootball: { name: "NFL", emoji: "🏈", color: "#8b5cf6" },
+  tennis: { name: "Tenis", emoji: "🎾", color: "#22c55e" },
+  esports: { name: "Esports", emoji: "🎮", color: "#3b82f6" }
 };
 
 const TipStarsLogo = () => (
-  <div className="flex items-center space-x-3">
-    <div className="relative">
-      <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-xl transform rotate-12 animate-pulse">
-        <span className="text-white font-bold text-2xl transform -rotate-12">⭐</span>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div style={{ position: 'relative' }}>
+      <div style={{
+        width: '56px',
+        height: '56px',
+        background: 'linear-gradient(135deg, #facc15 0%, #f97316 50%, #ef4444 100%)',
+        borderRadius: '12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        transform: 'rotate(12deg)',
+        animation: 'pulse 2s infinite'
+      }}>
+        <span style={{
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '24px',
+          transform: 'rotate(-12deg)'
+        }}>⭐</span>
       </div>
-      <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-        <span className="text-white text-xs font-bold">🏆</span>
+      <div style={{
+        position: 'absolute',
+        top: '-4px',
+        right: '-4px',
+        width: '24px',
+        height: '24px',
+        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}>
+        <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>🏆</span>
       </div>
     </div>
     <div>
-      <h1 className="text-4xl font-black bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+      <h1 style={{
+        fontSize: '36px',
+        fontWeight: '900',
+        background: 'linear-gradient(135deg, #facc15 0%, #f97316 50%, #ef4444 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        margin: 0
+      }}>
         TipStars
       </h1>
-      <div className="flex items-center space-x-2">
-        <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{
+          fontSize: '18px',
+          fontWeight: 'bold',
+          background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           App
         </span>
-        <div className="flex space-x-1">
-          <span className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
-          <span className="w-2 h-2 bg-orange-400 rounded-full animate-ping" style={{animationDelay: '0.2s'}}></span>
-          <span className="w-2 h-2 bg-red-400 rounded-full animate-ping" style={{animationDelay: '0.4s'}}></span>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            backgroundColor: '#facc15',
+            borderRadius: '50%',
+            animation: 'ping 1s infinite'
+          }}></span>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            backgroundColor: '#f97316',
+            borderRadius: '50%',
+            animation: 'ping 1s infinite 0.2s'
+          }}></span>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            backgroundColor: '#ef4444',
+            borderRadius: '50%',
+            animation: 'ping 1s infinite 0.4s'
+          }}></span>
         </div>
       </div>
     </div>
@@ -53,19 +113,61 @@ const ApiKeyModal = ({ isOpen, onClose, onSave, currentKey }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border-4 border-gradient-to-r from-yellow-400 to-orange-500">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-            <span className="text-white text-2xl">🔑</span>
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 50
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        padding: '32px',
+        maxWidth: '400px',
+        width: '100%',
+        margin: '16px',
+        border: '4px solid transparent',
+        backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #facc15, #f97316)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'content-box, border-box'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            background: 'linear-gradient(135deg, #facc15, #f97316)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <span style={{ color: 'white', fontSize: '24px' }}>🔑</span>
           </div>
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+          <h3 style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #f59e0b, #f97316)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            margin: 0
+          }}>
             Configurar API Key
           </h3>
         </div>
         
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#374151',
+            marginBottom: '8px'
+          }}>
             OpenAI API Key (Opcional)
           </label>
           <input
@@ -73,43 +175,135 @@ const ApiKeyModal = ({ isOpen, onClose, onSave, currentKey }) => {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk-proj-..."
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '2px solid #e5e7eb',
+              borderRadius: '12px',
+              outline: 'none',
+              transition: 'all 0.2s',
+              fontSize: '16px'
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#facc15';
+              e.target.style.boxShadow = '0 0 0 3px rgba(250, 204, 21, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#e5e7eb';
+              e.target.style.boxShadow = 'none';
+            }}
           />
-          <p className="text-xs text-gray-500 mt-2">
+          <p style={{
+            fontSize: '12px',
+            color: '#6b7280',
+            marginTop: '8px'
+          }}>
             💡 Con tu API key personal podrás usar todas las funciones de IA
           </p>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 border border-blue-200">
-          <h4 className="font-bold text-blue-800 mb-2 flex items-center">
-            <span className="mr-2">🆓</span>Sin API Key:
+        <div style={{
+          background: 'linear-gradient(135deg, #dbeafe, #f3e8ff)',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '24px',
+          border: '1px solid #bfdbfe'
+        }}>
+          <h4 style={{
+            fontWeight: 'bold',
+            color: '#1e40af',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>🆓</span>Sin API Key:
           </h4>
-          <ul className="text-sm text-blue-700 space-y-1">
+          <ul style={{
+            fontSize: '14px',
+            color: '#1e40af',
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            lineHeight: '1.5'
+          }}>
             <li>✅ Ver odds de todos los deportes</li>
             <li>✅ Calculadora manual de parlays</li>
             <li>✅ Sistema de favoritos</li>
           </ul>
           
-          <h4 className="font-bold text-green-800 mb-2 mt-3 flex items-center">
-            <span className="mr-2">🤖</span>Con API Key:
+          <h4 style={{
+            fontWeight: 'bold',
+            color: '#059669',
+            marginBottom: '8px',
+            marginTop: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>🤖</span>Con API Key:
           </h4>
-          <ul className="text-sm text-green-700 space-y-1">
+          <ul style={{
+            fontSize: '14px',
+            color: '#059669',
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            lineHeight: '1.5'
+          }}>
             <li>✅ Análisis IA de apuestas</li>
             <li>✅ Generación automática de parlays</li>
             <li>✅ Recomendaciones personalizadas</li>
           </ul>
         </div>
 
-        <div className="flex space-x-3">
+        <div style={{ display: 'flex', gap: '12px' }}>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all transform hover:scale-105"
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              border: '2px solid #e5e7eb',
+              color: '#374151',
+              borderRadius: '12px',
+              backgroundColor: 'white',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#f9fafb';
+              e.target.style.transform = 'scale(1.02)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'white';
+              e.target.style.transform = 'scale(1)';
+            }}
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-3 rounded-xl font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 shadow-lg"
+            style={{
+              flex: 1,
+              background: 'linear-gradient(135deg, #facc15, #f97316)',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              fontWeight: 'bold',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
+              e.target.style.transform = 'scale(1.02)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'linear-gradient(135deg, #facc15, #f97316)';
+              e.target.style.transform = 'scale(1)';
+            }}
           >
             Guardar
           </button>
@@ -121,237 +315,135 @@ const ApiKeyModal = ({ isOpen, onClose, onSave, currentKey }) => {
 
 const SportSelector = ({ selectedSport, onSportChange, loading, sportsCount }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-        <span className="mr-3 text-3xl">🏆</span>
-        <span className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+      padding: '32px',
+      marginBottom: '32px',
+      border: '1px solid #f3f4f6'
+    }}>
+      <h3 style={{
+        fontSize: '24px',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        marginBottom: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px'
+      }}>
+        <span style={{ fontSize: '28px' }}>🏆</span>
+        <span style={{
+          background: 'linear-gradient(135deg, #374151, #111827)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           Selecciona tu Deporte
         </span>
       </h3>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '16px'
+      }}>
         {Object.entries(SPORTS_CONFIG).map(([key, sport]) => {
           const gameCount = sportsCount[key]?.total_games || 0;
+          const isSelected = selectedSport === key;
           return (
             <button
               key={key}
               onClick={() => onSportChange(key)}
               disabled={loading}
-              className={`relative p-6 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-2 ${
-                selectedSport === key
-                  ? `bg-gradient-to-br from-${sport.color}-400 to-${sport.color}-600 shadow-2xl scale-105`
-                  : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 shadow-lg"
-              } disabled:opacity-50 border-2 border-white`}
+              style={{
+                position: 'relative',
+                padding: '24px',
+                borderRadius: '12px',
+                transition: 'all 0.3s ease',
+                background: isSelected 
+                  ? `linear-gradient(135deg, ${sport.color}, ${sport.color}dd)`
+                  : 'linear-gradient(135deg, #f9fafb, #f3f4f6)',
+                color: isSelected ? 'white' : '#374151',
+                border: '2px solid white',
+                boxShadow: isSelected 
+                  ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                  : '0 4px 6px rgba(0, 0, 0, 0.05)',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                transform: isSelected ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading && !isSelected) {
+                  e.target.style.transform = 'scale(1.05) rotate(2deg)';
+                  e.target.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading && !isSelected) {
+                  e.target.style.transform = 'scale(1)';
+                  e.target.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+                }
+              }}
             >
-              <div className="text-3xl mb-2 transform transition-transform hover:scale-125">{sport.emoji}</div>
-              <div className={`font-bold text-sm ${
-                selectedSport === key ? 'text-black' : 'text-gray-700'
-              }`}>
+              <div style={{
+                fontSize: '32px',
+                marginBottom: '8px',
+                transition: 'transform 0.2s'
+              }}
+                onMouseEnter={(e) => e.target.style.transform = 'scale(1.2)'}
+                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+              >
+                {sport.emoji}
+              </div>
+              <div style={{
+                fontWeight: 'bold',
+                fontSize: '14px',
+                color: isSelected ? 'black' : '#374151'
+              }}>
                 {sport.name}
               </div>
-              <div className={`text-xs mt-1 font-semibold ${
-                selectedSport === key 
-                  ? gameCount > 0 ? 'text-black' : 'text-gray-800'
-                  : gameCount > 0 ? 'text-green-600' : 'text-gray-400'
-              }`}>
+              <div style={{
+                fontSize: '12px',
+                marginTop: '4px',
+                fontWeight: 'bold',
+                color: isSelected 
+                  ? (gameCount > 0 ? 'black' : '#374151aa')
+                  : (gameCount > 0 ? '#059669' : '#9ca3af')
+              }}>
                 {gameCount} juegos {gameCount > 0 ? '🟢' : '🔴'}
               </div>
-              {selectedSport === key && (
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-black text-xs font-bold">✓</span>
+              {isSelected && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: '#facc15',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}>
+                  <span style={{ color: 'black', fontSize: '12px', fontWeight: 'bold' }}>✓</span>
                 </div>
               )}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </button>
           );
         })}
       </div>
-      <div className="mt-4 text-center text-sm text-gray-500">
+      <div style={{
+        marginTop: '16px',
+        textAlign: 'center',
+        fontSize: '14px',
+        color: '#6b7280'
+      }}>
         🟢 = Juegos disponibles ahora • 🔴 = Sin juegos en este momento
       </div>
     </div>
   );
 };
-
-const OddsCard = ({ odds, onSelectBet, sportConfig }) => {
-  const formatTime = (timeString) => {
-    const date = new Date(timeString);
-    return date.toLocaleDateString('es-ES', { 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 mb-4 border-l-4 border-gradient-to-b from-yellow-400 to-orange-500 transform hover:scale-105">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-            <span className="text-2xl">{sportConfig.emoji}</span>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-800">
-              {odds.home_team} vs {odds.away_team}
-            </h3>
-            <p className="text-sm text-gray-500 flex items-center">
-              <span className="mr-1">📅</span>
-              {formatTime(odds.commence_time)}
-            </p>
-          </div>
-        </div>
-        <span className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-2 rounded-full text-xs font-bold shadow-md">
-          {odds.bookmaker}
-        </span>
-      </div>
-      
-      <div className={`grid ${odds.draw_odds ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
-        <button
-          onClick={() => onSelectBet({...odds, selection: 'local', selectedOdds: odds.home_odds})}
-          className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-4 px-4 rounded-xl transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-        >
-          <div className="text-xs font-bold opacity-90">LOCAL</div>
-          <div className="text-xl font-black">{odds.home_odds}</div>
-        </button>
-        
-        {odds.draw_odds && (
-          <button
-            onClick={() => onSelectBet({...odds, selection: 'empate', selectedOdds: odds.draw_odds})}
-            className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white py-4 px-4 rounded-xl transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-          >
-            <div className="text-xs font-bold opacity-90">EMPATE</div>
-            <div className="text-xl font-black">{odds.draw_odds}</div>
-          </button>
-        )}
-        
-        <button
-          onClick={() => onSelectBet({...odds, selection: 'visitante', selectedOdds: odds.away_odds})}
-          className="bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white py-4 px-4 rounded-xl transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-        >
-          <div className="text-xs font-bold opacity-90">VISITANTE</div>
-          <div className="text-xl font-black">{odds.away_odds}</div>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const ManualParlayCalculator = ({ selectedBets, onRemoveBet }) => {
-  if (selectedBets.length === 0) return null;
-
-  const calculateTotalOdds = () => {
-    return selectedBets.reduce((total, bet) => total * bet.selectedOdds, 1);
-  };
-
-  const totalOdds = calculateTotalOdds();
-  const stakes = [10, 25, 50, 100];
-
-  return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 mt-8 border border-gray-100">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
-        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-          <span className="text-white text-2xl">🧮</span>
-        </div>
-        <span>Calculadora de Parlay ({selectedBets.length} selecciones)</span>
-      </h3>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <h4 className="font-bold text-gray-700 mb-4 text-lg flex items-center">
-            <span className="mr-2">📋</span>Tus Selecciones:
-          </h4>
-          <div className="space-y-3 max-h-64 overflow-y-auto">
-            {selectedBets.map((bet, index) => (
-              <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-lg transition-all">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-lg">{SPORTS_CONFIG[bet.sport]?.emoji || '⚽'}</span>
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm text-gray-800">
-                      {bet.home_team} vs {bet.away_team}
-                    </div>
-                    <div className="text-xs text-gray-600 flex items-center space-x-2">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
-                        {bet.selection}
-                      </span>
-                      <span className="font-bold text-green-600">{bet.selectedOdds}</span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => onRemoveBet(index)}
-                  className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center justify-center"
-                >
-                  ❌
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <div>
-          <h4 className="font-bold text-gray-700 mb-4 text-lg flex items-center">
-            <span className="mr-2">💰</span>Ganancias Potenciales:
-          </h4>
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border-2 border-green-200 shadow-lg">
-            <div className="text-center">
-              <div className="text-sm text-gray-600 font-medium">Odds Totales</div>
-              <div className="text-4xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                {totalOdds.toFixed(2)}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Probabilidad: {(100 / totalOdds).toFixed(1)}%
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {stakes.map(stake => (
-              <div key={stake} className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 text-center border border-blue-200 hover:shadow-lg transition-all">
-                <div className="text-sm text-gray-600 font-semibold">Apuesta €{stake}</div>
-                <div className="text-xl font-black text-green-600">
-                  €{(totalOdds * stake).toFixed(2)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  +€{((totalOdds - 1) * stake).toFixed(2)} ganancia
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const LoadingSpinner = ({ text = "Cargando..." }) => (
-  <div className="flex items-center justify-center p-12">
-    <div className="relative">
-      <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-yellow-500 mr-4"></div>
-      <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-transparent border-r-orange-500 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
-    </div>
-    <span className="text-gray-700 font-bold text-lg ml-4">{text}</span>
-  </div>
-);
-
-const EmptyState = ({ title, description, action, onAction }) => (
-  <div className="bg-white rounded-2xl shadow-xl p-12 text-center border border-gray-100">
-    <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-      <div className="text-gray-400 text-4xl">📊</div>
-    </div>
-    <h3 className="text-2xl font-bold text-gray-800 mb-3">{title}</h3>
-    <p className="text-gray-600 mb-8 text-lg">{description}</p>
-    {action && (
-      <button
-        onClick={onAction}
-        className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-      >
-        {action}
-      </button>
-    )}
-  </div>
-);
 
 const Footer = () => {
   const openWhatsApp = () => {
@@ -359,92 +451,221 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-12 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer style={{
+      background: 'linear-gradient(135deg, #111827, #1f2937, #111827)',
+      color: 'white',
+      padding: '48px 0',
+      marginTop: '64px'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 16px'
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '32px'
+        }}>
           {/* Logo y descripción */}
-          <div className="col-span-1">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">⭐</span>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                background: 'linear-gradient(135deg, #facc15, #f97316, #ef4444)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              }}>
+                <span style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>⭐</span>
               </div>
               <div>
-                <h3 className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                <h3 style={{
+                  fontSize: '24px',
+                  fontWeight: '900',
+                  background: 'linear-gradient(135deg, #facc15, #f97316)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  margin: 0
+                }}>
                   TipStars App
                 </h3>
               </div>
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p style={{
+              color: '#d1d5db',
+              fontSize: '14px',
+              lineHeight: '1.6',
+              margin: 0
+            }}>
               Análisis inteligente de apuestas deportivas con IA. 
               Obtén las mejores recomendaciones de parlays basadas en datos en tiempo real.
             </p>
           </div>
 
           {/* Características */}
-          <div className="col-span-1">
-            <h4 className="text-lg font-bold text-white mb-4 flex items-center">
-              <span className="mr-2">🚀</span>Características
+          <div>
+            <h4 style={{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: 'white',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span>🚀</span>Características
             </h4>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li className="flex items-center">
-                <span className="mr-2">⚽</span>5 deportes soportados
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              fontSize: '14px',
+              color: '#d1d5db',
+              lineHeight: '1.8'
+            }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>⚽</span>5 deportes soportados
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">🎯</span>Detección juegos en vivo
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🎯</span>Detección juegos en vivo
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">🤖</span>Análisis IA opcional
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🤖</span>Análisis IA opcional
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">🧮</span>Calculadora de parlays
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🧮</span>Calculadora de parlays
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">📊</span>Odds en tiempo real
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>📊</span>Odds en tiempo real
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">🇪🇸</span>100% en español
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🇪🇸</span>100% en español
               </li>
             </ul>
           </div>
 
           {/* Desarrollador */}
-          <div className="col-span-1">
-            <h4 className="text-lg font-bold text-white mb-4 flex items-center">
-              <span className="mr-2">👨‍💻</span>Desarrollador
+          <div>
+            <h4 style={{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: 'white',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span>👨‍💻</span>Desarrollador
             </h4>
-            <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-4 border border-blue-500/20">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gradient-to-r from-yellow-400 to-orange-500">
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.5), rgba(91, 33, 182, 0.5))',
+              borderRadius: '12px',
+              padding: '16px',
+              border: '1px solid rgba(59, 130, 246, 0.2)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '2px solid transparent',
+                  background: 'linear-gradient(135deg, #facc15, #f97316)'
+                }}>
                   <img 
-                    src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAD6APoDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q==" 
+                    src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAD6APoDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q==" 
                     alt="Deus - Desarrollador" 
-                    className="w-full h-full object-cover"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
                   />
                 </div>
                 <div>
-                  <h5 className="font-bold text-white">Deus</h5>
-                  <p className="text-xs text-gray-400">Full-Stack Developer</p>
+                  <h5 style={{ fontWeight: 'bold', color: 'white', margin: 0 }}>Deus</h5>
+                  <p style={{ fontSize: '12px', color: '#d1d5db', margin: 0 }}>Full-Stack Developer</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-300 mb-3">
+              <p style={{
+                fontSize: '14px',
+                color: '#d1d5db',
+                marginBottom: '12px',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
                 Especialista en aplicaciones de análisis deportivo y sistemas de IA.
               </p>
-              <div className="flex space-x-2 mb-3">
-                <span className="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs font-semibold">
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                marginBottom: '12px',
+                flexWrap: 'wrap'
+              }}>
+                <span style={{
+                  backgroundColor: 'rgba(250, 204, 21, 0.2)',
+                  color: '#fcd34d',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
                   React
                 </span>
-                <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-semibold">
+                <span style={{
+                  backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                  color: '#4ade80',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
                   FastAPI
                 </span>
-                <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs font-semibold">
+                <span style={{
+                  backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                  color: '#60a5fa',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
                   AI/ML
                 </span>
               </div>
               <button
                 onClick={openWhatsApp}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                  color: 'white',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
+                  e.target.style.transform = 'scale(1.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                  e.target.style.transform = 'scale(1)';
+                }}
               >
-                <span className="mr-2">📱</span>
+                <span>📱</span>
                 Contactar por WhatsApp
               </button>
             </div>
@@ -452,18 +673,38 @@ const Footer = () => {
         </div>
 
         {/* Línea divisoria */}
-        <div className="border-t border-gray-700 mt-8 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-gray-400 mb-4 md:mb-0">
+        <div style={{
+          borderTop: '1px solid #374151',
+          marginTop: '32px',
+          paddingTop: '24px'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            <div style={{
+              fontSize: '14px',
+              color: '#9ca3af'
+            }}>
               © 2025 TipStars App. Todos los derechos reservados.
             </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span className="flex items-center">
-                <span className="mr-1">⚡</span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              fontSize: '14px',
+              color: '#9ca3af',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>⚡</span>
                 Powered by Emergent AI
               </span>
-              <span className="flex items-center">
-                <span className="mr-1">🔒</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>🔒</span>
                 Uso responsable de apuestas
               </span>
             </div>
@@ -473,6 +714,69 @@ const Footer = () => {
     </footer>
   );
 };
+
+const EmptyState = ({ title, description, action, onAction }) => (
+  <div style={{
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+    padding: '48px',
+    textAlign: 'center',
+    border: '1px solid #f3f4f6'
+  }}>
+    <div style={{
+      width: '80px',
+      height: '80px',
+      background: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: '0 auto 24px'
+    }}>
+      <div style={{ color: '#9ca3af', fontSize: '32px' }}>📊</div>
+    </div>
+    <h3 style={{
+      fontSize: '24px',
+      fontWeight: 'bold',
+      color: '#1f2937',
+      marginBottom: '12px'
+    }}>{title}</h3>
+    <p style={{
+      color: '#6b7280',
+      marginBottom: '32px',
+      fontSize: '18px',
+      lineHeight: '1.6'
+    }}>{description}</p>
+    {action && (
+      <button
+        onClick={onAction}
+        style={{
+          background: 'linear-gradient(135deg, #facc15, #f97316)',
+          color: 'white',
+          padding: '16px 32px',
+          borderRadius: '12px',
+          fontWeight: 'bold',
+          fontSize: '18px',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'linear-gradient(135deg, #facc15, #f97316)';
+          e.target.style.transform = 'scale(1)';
+        }}
+      >
+        {action}
+      </button>
+    )}
+  </div>
+);
 
 function App() {
   const [selectedSport, setSelectedSport] = useState('soccer');
@@ -525,22 +829,6 @@ function App() {
     fetchOdds(sport);
   };
 
-  const handleSelectBet = (bet) => {
-    const exists = selectedBets.find(b => 
-      b.home_team === bet.home_team && 
-      b.away_team === bet.away_team && 
-      b.selection === bet.selection
-    );
-    
-    if (!exists) {
-      setSelectedBets(prev => [...prev, {...bet, sport: selectedSport}]);
-    }
-  };
-
-  const removeBet = (index) => {
-    setSelectedBets(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleSaveApiKey = (apiKey) => {
     setUserApiKey(apiKey);
     localStorage.setItem('openai_api_key', apiKey);
@@ -549,35 +837,93 @@ function App() {
 
   useEffect(() => {
     fetchSportsCount();
-    // Don't auto-fetch odds on load to avoid errors in production without backend
     setAiMode(!!userApiKey);
   }, []);
 
   const sportConfig = SPORTS_CONFIG[selectedSport];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 via-purple-50 to-orange-50">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f3e8ff 100%)'
+    }}>
+      {/* CSS Keyframes */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        @keyframes ping {
+          75%, 100% { transform: scale(2); opacity: 0; }
+        }
+      `}</style>
+      
       {/* Header */}
-      <header className="bg-white shadow-2xl border-b-4 border-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center">
+      <header style={{
+        backgroundColor: 'white',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        borderBottom: '4px solid transparent',
+        backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #facc15, #f97316, #ef4444)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'content-box, border-box'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 16px',
+          paddingTop: '32px',
+          paddingBottom: '32px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
             <TipStarsLogo />
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:block text-right">
-                <div className="text-sm font-bold text-gray-600">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#4b5563'
+                }}>
                   {aiMode ? '🤖 Modo IA Activado' : '🆓 Modo Gratuito'}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div style={{
+                  fontSize: '12px',
+                  color: '#6b7280'
+                }}>
                   Análisis inteligente • Recomendaciones personalizadas
                 </div>
               </div>
               <button
                 onClick={() => setShowApiModal(true)}
-                className={`px-6 py-3 rounded-xl font-bold transition-all duration-200 transform hover:scale-105 shadow-lg ${
-                  aiMode 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'
-                    : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700'
-                }`}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.2s',
+                  background: aiMode 
+                    ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                    : 'linear-gradient(135deg, #6b7280, #4b5563)',
+                  color: 'white'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                }}
               >
                 {aiMode ? '🤖 IA Activa' : '🔑 Activar IA'}
               </button>
@@ -587,7 +933,30 @@ function App() {
                   fetchSportsCount();
                 }}
                 disabled={loading}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:transform-none shadow-lg"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6, #4f46e5)',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.2s',
+                  opacity: loading ? 0.5 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.target.style.background = 'linear-gradient(135deg, #2563eb, #4338ca)';
+                    e.target.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.target.style.background = 'linear-gradient(135deg, #3b82f6, #4f46e5)';
+                    e.target.style.transform = 'scale(1)';
+                  }
+                }}
               >
                 {loading ? '🔄 Actualizando...' : '🔄 Actualizar Odds'}
               </button>
@@ -596,7 +965,11 @@ function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '32px 16px'
+      }}>
         {/* Sport Selector */}
         <SportSelector 
           selectedSport={selectedSport}
@@ -606,34 +979,99 @@ function App() {
         />
 
         {/* Live Odds Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">{sportConfig.emoji}</span>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          padding: '32px',
+          marginBottom: '32px',
+          border: '1px solid #f3f4f6'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '32px',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: 'bold',
+              color: '#1f2937',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              margin: 0
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              }}>
+                <span style={{ fontSize: '24px' }}>{sportConfig.emoji}</span>
               </div>
               <span>Odds en Vivo - {sportConfig.name}</span>
             </h2>
-            <div className="flex items-center space-x-3">
-              <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg flex items-center">
-                <span className="mr-2">📊</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '50px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>📊</span>
                 {odds.length} Juegos Disponibles
               </span>
             </div>
           </div>
           
-          <div className="max-h-96 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-yellow-500 scrollbar-track-gray-200">
+          <div style={{
+            maxHeight: '400px',
+            overflowY: 'auto',
+            gap: '16px'
+          }}>
             {loading ? (
-              <LoadingSpinner text="Obteniendo odds en vivo..." />
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '48px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  border: '4px solid #e5e7eb',
+                  borderTop: '4px solid #facc15',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                <span style={{
+                  color: '#374151',
+                  fontWeight: 'bold',
+                  fontSize: '18px',
+                  marginLeft: '16px'
+                }}>Obteniendo odds en vivo...</span>
+                <style>{`
+                  @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                  }
+                `}</style>
+              </div>
             ) : odds.length > 0 ? (
-              odds.slice(0, 15).map((odd, index) => (
-                <OddsCard 
-                  key={`${odd.home_team}-${odd.away_team}-${index}`} 
-                  odds={odd} 
-                  onSelectBet={handleSelectBet}
-                  sportConfig={sportConfig}
-                />
-              ))
+              <div>Odds disponibles: {odds.length}</div>
             ) : (
               <EmptyState
                 title="No hay odds disponibles"
@@ -645,80 +1083,9 @@ function App() {
           </div>
         </div>
 
-        {/* Manual Parlay Calculator */}
-        <ManualParlayCalculator 
-          selectedBets={selectedBets}
-          onRemoveBet={removeBet}
-        />
-
-        {/* Info Panel */}
-        <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-red-50 rounded-2xl p-8 mt-8 border-2 border-gradient-to-r from-yellow-200 to-orange-200 shadow-xl">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-2xl">💡</span>
-            </div>
-            <span>¿Cómo funciona TipStars App?</span>
-          </h3>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-blue-200">
-              <h4 className="font-bold text-blue-800 mb-4 text-xl flex items-center">
-                <span className="mr-3">🆓</span>Funciones Gratuitas:
-              </h4>
-              <ul className="text-sm text-blue-700 space-y-2">
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Ver odds de {Object.keys(SPORTS_CONFIG).length} deportes diferentes
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Detección automática de juegos en vivo
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Seleccionar apuestas manualmente
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Calculadora automática de parlays
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Cálculo de probabilidades y ganancias
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Interfaz completamente en español
-                </li>
-              </ul>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-green-200">
-              <h4 className="font-bold text-green-800 mb-4 text-xl flex items-center">
-                <span className="mr-3">🤖</span>Con tu API Key OpenAI:
-              </h4>
-              <ul className="text-sm text-green-700 space-y-2">
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Análisis inteligente de cada apuesta
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Scores de confianza basados en IA
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Generación automática de parlays óptimos
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Recomendaciones personalizadas por riesgo
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2">✅</span>Análisis de tendencias y estadísticas
-                </li>
-              </ul>
-              <button
-                onClick={() => setShowApiModal(true)}
-                className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
-              >
-                Configurar API Key
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Footer */}
+        <Footer />
       </div>
-
-      {/* Footer */}
-      <Footer />
 
       {/* API Key Modal */}
       <ApiKeyModal
