@@ -678,16 +678,6 @@ function App() {
 }
 
 export default App;
-
-const SportSelector = ({ selectedSport, onSportChange, loading }) => {
-  return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-      <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-        🏆 Selecciona tu Deporte
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {Object.entries(SPORTS_CONFIG).map(([key, sport]) => (
-          <button
             key={key}
             onClick={() => onSportChange(key)}
             disabled={loading}
