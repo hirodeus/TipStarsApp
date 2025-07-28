@@ -13,6 +13,7 @@ import httpx
 import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
+import random
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,7 +24,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="Asistente de Apuestas Deportivas", description="API para análisis inteligente de apuestas deportivas")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -32,9 +33,44 @@ api_router = APIRouter(prefix="/api")
 ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
+# Supported sports configuration
+SPORTS_CONFIG = {
+    "soccer": {
+        "name": "Fútbol",
+        "emoji": "⚽",
+        "api_keys": ["soccer_epl", "soccer_spain_la_liga", "soccer_uefa_champs_league"],
+        "markets": ["h2h", "spreads", "totals"]
+    },
+    "basketball": {
+        "name": "Baloncesto (NBA)",
+        "emoji": "🏀", 
+        "api_keys": ["basketball_nba"],
+        "markets": ["h2h", "spreads", "totals"]
+    },
+    "americanfootball": {
+        "name": "Fútbol Americano (NFL)",
+        "emoji": "🏈",
+        "api_keys": ["americanfootball_nfl"],
+        "markets": ["h2h", "spreads", "totals"]
+    },
+    "tennis": {
+        "name": "Tenis",
+        "emoji": "🎾",
+        "api_keys": ["tennis_atp", "tennis_wta"],
+        "markets": ["h2h"]
+    },
+    "esports": {
+        "name": "Esports",
+        "emoji": "🎮",
+        "api_keys": ["esports_lol", "esports_dota2", "esports_csgo"],
+        "markets": ["h2h"]
+    }
+}
+
 class OddsData(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     sport: str
+    sport_name: str
     home_team: str
     away_team: str
     commence_time: str
@@ -42,6 +78,10 @@ class OddsData(BaseModel):
     home_odds: float
     away_odds: float
     draw_odds: Optional[float] = None
+    spread_home: Optional[float] = None
+    spread_away: Optional[float] = None
+    total_over: Optional[float] = None
+    total_under: Optional[float] = None
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
 
 class UserPreferences(BaseModel):
@@ -49,11 +89,12 @@ class UserPreferences(BaseModel):
     user_id: str
     min_odds: float = 1.5
     max_legs: int = 4
-    risk_level: str = "medium"  # low, medium, high
+    risk_level: str = "medio"  # bajo, medio, alto
+    preferred_sports: List[str] = ["soccer"]
     preferred_leagues: List[str] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-class ParlayBet(BaseModel):
+class MockBet(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     home_team: str
     away_team: str
@@ -61,10 +102,12 @@ class ParlayBet(BaseModel):
     odds: float
     confidence_score: float
     reasoning: str
+    sport: str
+    sport_name: str
 
-class ParlayRecommendation(BaseModel):
+class MockParlayRecommendation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    parlays: List[List[ParlayBet]]
+    parlays: List[List[MockBet]]
     total_odds: List[float]
     risk_levels: List[str]
     potential_payouts: List[float]
@@ -72,242 +115,299 @@ class ParlayRecommendation(BaseModel):
 
 @api_router.get("/")
 async def root():
-    return {"message": "Sports Betting Assistant API"}
+    return {"message": "API del Asistente de Apuestas Deportivas", "status": "activo"}
 
-@api_router.get("/odds/soccer")
-async def get_soccer_odds():
-    """Fetch live soccer odds from TheOddsAPI"""
+@api_router.get("/deportes")
+async def get_supported_sports():
+    """Obtener lista de deportes soportados"""
+    return {"deportes": SPORTS_CONFIG}
+
+@api_router.get("/odds/{sport}")
+async def get_odds_by_sport(sport: str):
+    """Obtener odds en vivo para un deporte específico"""
+    if sport not in SPORTS_CONFIG:
+        raise HTTPException(status_code=404, detail=f"Deporte '{sport}' no soportado")
+    
     try:
+        sport_config = SPORTS_CONFIG[sport]
+        all_odds = []
+        
         async with httpx.AsyncClient() as client:
-            url = f"https://api.the-odds-api.com/v4/sports/soccer_epl/odds"
-            params = {
-                "apiKey": ODDS_API_KEY,
-                "regions": "uk",
-                "markets": "h2h",
-                "oddsFormat": "decimal"
-            }
-            
-            response = await client.get(url, params=params)
-            response.raise_for_status()
-            
-            odds_data = response.json()
-            processed_odds = []
-            
-            for game in odds_data:
-                for bookmaker in game.get('bookmakers', []):
-                    for market in bookmaker.get('markets', []):
-                        if market['key'] == 'h2h':
-                            outcomes = {outcome['name']: outcome['price'] for outcome in market['outcomes']}
-                            
-                            odds_entry = OddsData(
-                                sport='soccer_epl',
-                                home_team=game['home_team'],
-                                away_team=game['away_team'],
-                                commence_time=game['commence_time'],
-                                bookmaker=bookmaker['title'],
-                                home_odds=outcomes.get(game['home_team'], 0),
-                                away_odds=outcomes.get(game['away_team'], 0),
-                                draw_odds=outcomes.get('Draw', None)
-                            )
-                            processed_odds.append(odds_entry)
-            
-            # Store in database
-            if processed_odds:
-                odds_dicts = [odds.dict() for odds in processed_odds]
-                await db.odds_data.insert_many(odds_dicts)
-            
-            return {"odds": processed_odds[:20], "total_games": len(processed_odds)}
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching odds: {str(e)}")
-
-@api_router.post("/analyze/bet")
-async def analyze_bet(bet_data: Dict[str, Any]):
-    """Analyze a single bet using AI"""
-    try:
-        chat = LlmChat(
-            api_key=OPENAI_API_KEY,
-            session_id=f"bet_analysis_{uuid.uuid4()}",
-            system_message="""You are an expert sports betting analyst specializing in soccer.
-            Analyze the provided bet data and return a JSON response with:
-            - confidence_score (0-100)
-            - reasoning (brief explanation)
-            - risk_level (low/medium/high)
-            
-            Consider team form, recent performance, odds value, and any other relevant factors."""
-        ).with_model("openai", "gpt-4o")
+            # Fetch odds for each league/tournament in this sport
+            for api_key in sport_config["api_keys"]:
+                try:
+                    url = f"https://api.the-odds-api.com/v4/sports/{api_key}/odds"
+                    params = {
+                        "apiKey": ODDS_API_KEY,
+                        "regions": "uk,us,eu",
+                        "markets": "h2h,spreads,totals",
+                        "oddsFormat": "decimal"
+                    }
+                    
+                    response = await client.get(url, params=params)
+                    if response.status_code == 200:
+                        odds_data = response.json()
+                        
+                        for game in odds_data:
+                            for bookmaker in game.get('bookmakers', []):
+                                for market in bookmaker.get('markets', []):
+                                    odds_entry = OddsData(
+                                        sport=sport,
+                                        sport_name=sport_config["name"],
+                                        home_team=game['home_team'],
+                                        away_team=game['away_team'],
+                                        commence_time=game['commence_time'],
+                                        bookmaker=bookmaker['title']
+                                    )
+                                    
+                                    if market['key'] == 'h2h':
+                                        outcomes = {outcome['name']: outcome['price'] for outcome in market['outcomes']}
+                                        odds_entry.home_odds = outcomes.get(game['home_team'], 0)
+                                        odds_entry.away_odds = outcomes.get(game['away_team'], 0)
+                                        odds_entry.draw_odds = outcomes.get('Draw', None)
+                                    
+                                    elif market['key'] == 'spreads':
+                                        for outcome in market['outcomes']:
+                                            if outcome['name'] == game['home_team']:
+                                                odds_entry.spread_home = outcome['point']
+                                            elif outcome['name'] == game['away_team']:
+                                                odds_entry.spread_away = outcome['point']
+                                    
+                                    elif market['key'] == 'totals':
+                                        for outcome in market['outcomes']:
+                                            if outcome['name'] == 'Over':
+                                                odds_entry.total_over = outcome['price']
+                                            elif outcome['name'] == 'Under':
+                                                odds_entry.total_under = outcome['price']
+                                    
+                                    if odds_entry.home_odds > 0 or odds_entry.away_odds > 0:
+                                        all_odds.append(odds_entry)
+                
+                except Exception as e:
+                    logging.warning(f"Error fetching {api_key}: {str(e)}")
+                    continue
         
-        analysis_prompt = f"""
-        Analyze this soccer bet:
-        Match: {bet_data.get('home_team')} vs {bet_data.get('away_team')}
-        Selection: {bet_data.get('selection')}
-        Odds: {bet_data.get('odds')}
-        Bookmaker: {bet_data.get('bookmaker')}
+        # Store in database
+        if all_odds:
+            odds_dicts = [odds.dict() for odds in all_odds]
+            await db.odds_data.insert_many(odds_dicts)
         
-        Provide analysis in JSON format.
-        """
-        
-        user_message = UserMessage(text=analysis_prompt)
-        response = await chat.send_message(user_message)
-        
-        try:
-            analysis = json.loads(response)
-        except:
-            # Fallback if AI doesn't return proper JSON
-            analysis = {
-                "confidence_score": 70,
-                "reasoning": "Standard analysis based on odds value",
-                "risk_level": "medium"
-            }
-        
-        return analysis
+        return {
+            "odds": all_odds[:30], 
+            "total_games": len(all_odds),
+            "sport": sport_config["name"],
+            "emoji": sport_config["emoji"]
+        }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error analyzing bet: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error obteniendo odds: {str(e)}")
 
-@api_router.post("/generate/parlay")
-async def generate_parlay_recommendations(preferences: Dict[str, Any]):
-    """Generate AI-powered parlay recommendations"""
+@api_router.post("/generar/parlay-mock")
+async def generate_mock_parlay(preferences: Dict[str, Any]):
+    """Generar recomendaciones de parlay temporales (sin IA)"""
     try:
-        # Get latest odds from database
-        latest_odds = await db.odds_data.find().sort("fetched_at", -1).limit(50).to_list(50)
+        # Get latest odds from database for selected sports
+        selected_sports = preferences.get('preferred_sports', ['soccer'])
+        latest_odds = []
+        
+        for sport in selected_sports:
+            sport_odds = await db.odds_data.find({"sport": sport}).sort("fetched_at", -1).limit(20).to_list(20)
+            latest_odds.extend(sport_odds)
         
         if not latest_odds:
-            raise HTTPException(status_code=404, detail="No odds data available")
+            raise HTTPException(status_code=404, detail="No hay datos de odds disponibles")
         
         # Filter odds based on preferences
         min_odds = preferences.get('min_odds', 1.5)
         max_legs = preferences.get('max_legs', 4)
-        risk_level = preferences.get('risk_level', 'medium')
         
         filtered_bets = []
         
         for odds in latest_odds:
-            # Check home bet
-            if odds['home_odds'] >= min_odds:
+            # Add home bet if odds meet criteria
+            if odds.get('home_odds', 0) >= min_odds:
                 filtered_bets.append({
                     'home_team': odds['home_team'],
                     'away_team': odds['away_team'],
-                    'selection': 'home',
+                    'selection': 'local',
                     'odds': odds['home_odds'],
-                    'bookmaker': odds['bookmaker']
+                    'sport': odds['sport'],
+                    'sport_name': odds['sport_name']
                 })
             
-            # Check away bet
-            if odds['away_odds'] >= min_odds:
+            # Add away bet if odds meet criteria
+            if odds.get('away_odds', 0) >= min_odds:
                 filtered_bets.append({
                     'home_team': odds['home_team'],
                     'away_team': odds['away_team'],
-                    'selection': 'away',
+                    'selection': 'visitante',
                     'odds': odds['away_odds'],
-                    'bookmaker': odds['bookmaker']
+                    'sport': odds['sport'],
+                    'sport_name': odds['sport_name']
                 })
             
-            # Check draw bet if available
+            # Add draw bet if available and meets criteria
             if odds.get('draw_odds') and odds['draw_odds'] >= min_odds:
                 filtered_bets.append({
                     'home_team': odds['home_team'],
                     'away_team': odds['away_team'],
-                    'selection': 'draw',
+                    'selection': 'empate',
                     'odds': odds['draw_odds'],
-                    'bookmaker': odds['bookmaker']
+                    'sport': odds['sport'],
+                    'sport_name': odds['sport_name']
                 })
         
-        # Generate AI analysis for parlay combinations
-        chat = LlmChat(
-            api_key=OPENAI_API_KEY,
-            session_id=f"parlay_gen_{uuid.uuid4()}",
-            system_message="""You are an expert sports betting analyst. Generate 3 parlay recommendations:
-            1. Conservative (low risk, higher probability)
-            2. Balanced (medium risk, good value)
-            3. Aggressive (higher risk, higher reward)
-            
-            For each parlay, select 2-4 bets and provide reasoning."""
-        ).with_model("openai", "gpt-4o")
+        if len(filtered_bets) < 6:
+            raise HTTPException(status_code=404, detail="No hay suficientes apuestas que cumplan los criterios")
         
-        parlay_prompt = f"""
-        Available soccer bets (first 20):
-        {json.dumps(filtered_bets[:20], indent=2)}
+        # Generate mock parlays with realistic logic
+        mock_parlays = []
+        risk_levels = ['conservador', 'equilibrado', 'agresivo']
         
-        User preferences:
-        - Min odds per leg: {min_odds}
-        - Max legs per parlay: {max_legs}
-        - Risk level: {risk_level}
-        
-        Generate 3 parlay recommendations in JSON format:
-        {{
-            "conservative": [list of bet indices],
-            "balanced": [list of bet indices],
-            "aggressive": [list of bet indices]
-        }}
-        """
-        
-        user_message = UserMessage(text=parlay_prompt)
-        response = await chat.send_message(user_message)
-        
-        try:
-            ai_recommendations = json.loads(response)
-        except:
-            # Fallback recommendations
-            ai_recommendations = {
-                "conservative": [0, 1],
-                "balanced": [2, 3, 4],
-                "aggressive": [5, 6, 7, 8]
-            }
-        
-        # Build parlay recommendations
-        parlays = []
-        risk_levels = []
-        total_odds = []
-        
-        for risk_type, bet_indices in ai_recommendations.items():
+        for risk_level in risk_levels:
             parlay_bets = []
-            parlay_odds = 1.0
             
-            for idx in bet_indices:
-                if idx < len(filtered_bets):
-                    bet = filtered_bets[idx]
-                    
-                    parlay_bet = ParlayBet(
-                        home_team=bet['home_team'],
-                        away_team=bet['away_team'],
-                        selection=bet['selection'],
-                        odds=bet['odds'],
-                        confidence_score=75.0,  # Placeholder
-                        reasoning=f"Good value at {bet['odds']} odds"
-                    )
-                    
-                    parlay_bets.append(parlay_bet)
-                    parlay_odds *= bet['odds']
+            if risk_level == 'conservador':
+                # Conservative: 2-3 legs, lower odds, higher confidence
+                legs = random.randint(2, 3)
+                selected_bets = random.sample([b for b in filtered_bets if b['odds'] <= 2.5], min(legs, len(filtered_bets)))
+                confidence_range = (75, 90)
+            elif risk_level == 'equilibrado':
+                # Balanced: 3-4 legs, medium odds, medium confidence  
+                legs = random.randint(3, min(4, max_legs))
+                selected_bets = random.sample([b for b in filtered_bets if 1.8 <= b['odds'] <= 3.5], min(legs, len(filtered_bets)))
+                confidence_range = (60, 80)
+            else:  # agresivo
+                # Aggressive: 4+ legs, higher odds, lower confidence
+                legs = random.randint(4, max_legs)
+                selected_bets = random.sample([b for b in filtered_bets if b['odds'] >= 2.0], min(legs, len(filtered_bets)))
+                confidence_range = (45, 70)
+            
+            parlay_odds = 1.0
+            for bet in selected_bets:
+                confidence = random.randint(confidence_range[0], confidence_range[1])
+                
+                # Generate realistic reasoning based on bet
+                reasoning_options = [
+                    f"Buena forma reciente del equipo",
+                    f"Valor interesante con odds de {bet['odds']}",
+                    f"Estadísticas favorables en casa/visitante",
+                    f"Análisis técnico positivo",
+                    f"Tendencia histórica favorable"
+                ]
+                
+                mock_bet = MockBet(
+                    home_team=bet['home_team'],
+                    away_team=bet['away_team'], 
+                    selection=bet['selection'],
+                    odds=bet['odds'],
+                    confidence_score=confidence,
+                    reasoning=random.choice(reasoning_options),
+                    sport=bet['sport'],
+                    sport_name=bet['sport_name']
+                )
+                
+                parlay_bets.append(mock_bet)
+                parlay_odds *= bet['odds']
             
             if parlay_bets:
-                parlays.append(parlay_bets)
-                risk_levels.append(risk_type)
-                total_odds.append(round(parlay_odds, 2))
+                mock_parlays.append(parlay_bets)
         
-        recommendation = ParlayRecommendation(
-            parlays=parlays,
+        # Calculate total odds and payouts
+        total_odds = []
+        potential_payouts = []
+        
+        for parlay in mock_parlays:
+            parlay_total = 1.0
+            for bet in parlay:
+                parlay_total *= bet.odds
+            total_odds.append(round(parlay_total, 2))
+            potential_payouts.append(round(parlay_total * 10, 2))  # Assuming $10 bet
+        
+        recommendation = MockParlayRecommendation(
+            parlays=mock_parlays,
             total_odds=total_odds,
             risk_levels=risk_levels,
-            potential_payouts=[round(odds * 10, 2) for odds in total_odds]  # Assuming $10 bet
+            potential_payouts=potential_payouts
         )
         
-        # Store recommendation in database
-        await db.parlay_recommendations.insert_one(recommendation.dict())
+        # Store in database
+        await db.mock_parlay_recommendations.insert_one(recommendation.dict())
         
         return recommendation
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating parlays: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error generando parlays: {str(e)}")
 
-@api_router.get("/history/parlays")
+@api_router.get("/historial/parlays")
 async def get_parlay_history():
-    """Get recent parlay recommendations"""
+    """Obtener historial reciente de recomendaciones de parlay"""
     try:
-        history = await db.parlay_recommendations.find().sort("generated_at", -1).limit(10).to_list(10)
-        return {"history": history}
+        # Get both real and mock recommendations
+        real_history = await db.parlay_recommendations.find().sort("generated_at", -1).limit(5).to_list(5)
+        mock_history = await db.mock_parlay_recommendations.find().sort("generated_at", -1).limit(10).to_list(10)
+        
+        return {
+            "historial": mock_history + real_history,
+            "total": len(mock_history + real_history)
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error obteniendo historial: {str(e)}")
+
+@api_router.post("/favoritos")
+async def add_to_favorites(bet_data: Dict[str, Any]):
+    """Agregar apuesta a favoritos"""
+    try:
+        favorite = {
+            "id": str(uuid.uuid4()),
+            "bet_data": bet_data,
+            "created_at": datetime.utcnow()
+        }
+        
+        await db.favorites.insert_one(favorite)
+        return {"message": "Agregado a favoritos", "id": favorite["id"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error agregando a favoritos: {str(e)}")
+
+@api_router.get("/favoritos")
+async def get_favorites():
+    """Obtener apuestas favoritas"""
+    try:
+        favorites = await db.favorites.find().sort("created_at", -1).limit(20).to_list(20)
+        return {"favoritos": favorites}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error obteniendo favoritos: {str(e)}")
+
+@api_router.post("/calcular/parlay")
+async def calculate_parlay_odds(bets: List[Dict[str, Any]]):
+    """Calcular odds totales de un parlay manualmente"""
+    try:
+        if not bets:
+            raise HTTPException(status_code=400, detail="No se proporcionaron apuestas")
+        
+        total_odds = 1.0
+        total_bets = len(bets)
+        
+        for bet in bets:
+            bet_odds = bet.get('odds', 1.0)
+            total_odds *= bet_odds
+        
+        # Calculate different stake payouts
+        payouts = {
+            "10": round(total_odds * 10, 2),
+            "25": round(total_odds * 25, 2), 
+            "50": round(total_odds * 50, 2),
+            "100": round(total_odds * 100, 2)
+        }
+        
+        return {
+            "total_odds": round(total_odds, 2),
+            "total_bets": total_bets,
+            "potential_payouts": payouts,
+            "probability": round(100 / total_odds, 2) if total_odds > 0 else 0
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculando parlay: {str(e)}")
 
 # Include the router in the main app
 app.include_router(api_router)
