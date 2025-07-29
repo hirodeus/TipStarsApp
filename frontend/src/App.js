@@ -701,10 +701,6 @@ const Footer = () => {
               justifyContent: 'center'
             }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span>⚡</span>
-                Powered by Emergent AI
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span>🔒</span>
                 Uso responsable de apuestas
               </span>
