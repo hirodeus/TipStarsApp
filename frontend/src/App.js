@@ -448,7 +448,7 @@ const SportSelector = ({ selectedSport, onSportChange, loading, sportsCount }) =
 
 const Footer = () => {
   const openWhatsApp = () => {
-    window.open('https://wa.me/18134558994', '_blank');
+    window.open('https://wa.me/+528134558994', '_blank');
   };
 
   return (
