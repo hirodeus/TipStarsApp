@@ -1068,7 +1068,246 @@ function App() {
                 `}</style>
               </div>
             ) : odds.length > 0 ? (
-              <div>Odds disponibles: {odds.length}</div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+                gap: '20px',
+                padding: '16px 0'
+              }}>
+                {odds.slice(0, 20).map((odd, index) => (
+                  <div key={`${odd.id || index}-${odd.home_team}-${odd.away_team}`} style={{
+                    backgroundColor: 'white',
+                    borderRadius: '16px',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    border: '2px solid #f1f5f9',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 12px 35px rgba(0, 0, 0, 0.15)';
+                    e.currentTarget.style.borderColor = sportConfig.color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
+                    e.currentTarget.style.borderColor = '#f1f5f9';
+                  }}>
+                    {/* Header with match info */}
+                    <div style={{
+                      background: `linear-gradient(135deg, ${sportConfig.color}15, ${sportConfig.color}25)`,
+                      padding: '16px 20px',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '8px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          <span style={{ fontSize: '20px' }}>{sportConfig.emoji}</span>
+                          <span style={{
+                            backgroundColor: sportConfig.color,
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 'bold'
+                          }}>
+                            EN VIVO
+                          </span>
+                        </div>
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#64748b',
+                          fontWeight: '500'
+                        }}>
+                          {odd.bookmaker || 'Bookmaker'}
+                        </div>
+                      </div>
+                      
+                      {/* Teams */}
+                      <div style={{
+                        textAlign: 'center'
+                      }}>
+                        <div style={{
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#1e293b'
+                        }}>
+                          {odd.home_team}
+                        </div>
+                        <div style={{
+                          fontSize: '14px',
+                          color: '#64748b',
+                          margin: '4px 0'
+                        }}>
+                          vs
+                        </div>
+                        <div style={{
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#1e293b'
+                        }}>
+                          {odd.away_team}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Betting Options */}
+                    <div style={{ padding: '20px' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: odd.draw_odds ? '1fr 1fr 1fr' : '1fr 1fr',
+                        gap: '12px'
+                      }}>
+                        {/* Home Team */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Add to selected bets logic here
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                            border: '2px solid #e2e8f0',
+                            borderRadius: '12px',
+                            padding: '14px 8px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            fontSize: '13px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.background = `linear-gradient(135deg, ${sportConfig.color}20, ${sportConfig.color}30)`;
+                            e.target.style.borderColor = sportConfig.color;
+                            e.target.style.transform = 'scale(1.02)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.background = 'linear-gradient(135deg, #f8fafc, #e2e8f0)';
+                            e.target.style.borderColor = '#e2e8f0';
+                            e.target.style.transform = 'scale(1)';
+                          }}
+                        >
+                          <div style={{ fontWeight: 'bold', color: '#1e293b', fontSize: '11px', marginBottom: '4px' }}>
+                            LOCAL
+                          </div>
+                          <div style={{ 
+                            fontSize: '18px', 
+                            fontWeight: 'bold',
+                            color: sportConfig.color 
+                          }}>
+                            {odd.home_odds ? odd.home_odds.toFixed(2) : 'N/A'}
+                          </div>
+                        </button>
+
+                        {/* Draw (if available) */}
+                        {odd.draw_odds && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Add to selected bets logic here
+                            }}
+                            style={{
+                              background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                              border: '2px solid #e2e8f0',
+                              borderRadius: '12px',
+                              padding: '14px 8px',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              fontSize: '13px'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.background = `linear-gradient(135deg, ${sportConfig.color}20, ${sportConfig.color}30)`;
+                              e.target.style.borderColor = sportConfig.color;
+                              e.target.style.transform = 'scale(1.02)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.background = 'linear-gradient(135deg, #f8fafc, #e2e8f0)';
+                              e.target.style.borderColor = '#e2e8f0';
+                              e.target.style.transform = 'scale(1)';
+                            }}
+                          >
+                            <div style={{ fontWeight: 'bold', color: '#1e293b', fontSize: '11px', marginBottom: '4px' }}>
+                              EMPATE
+                            </div>
+                            <div style={{ 
+                              fontSize: '18px', 
+                              fontWeight: 'bold',
+                              color: sportConfig.color 
+                            }}>
+                              {odd.draw_odds.toFixed(2)}
+                            </div>
+                          </button>
+                        )}
+
+                        {/* Away Team */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Add to selected bets logic here
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                            border: '2px solid #e2e8f0',
+                            borderRadius: '12px',
+                            padding: '14px 8px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            fontSize: '13px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.background = `linear-gradient(135deg, ${sportConfig.color}20, ${sportConfig.color}30)`;
+                            e.target.style.borderColor = sportConfig.color;
+                            e.target.style.transform = 'scale(1.02)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.background = 'linear-gradient(135deg, #f8fafc, #e2e8f0)';
+                            e.target.style.borderColor = '#e2e8f0';
+                            e.target.style.transform = 'scale(1)';
+                          }}
+                        >
+                          <div style={{ fontWeight: 'bold', color: '#1e293b', fontSize: '11px', marginBottom: '4px' }}>
+                            VISITANTE
+                          </div>
+                          <div style={{ 
+                            fontSize: '18px', 
+                            fontWeight: 'bold',
+                            color: sportConfig.color 
+                          }}>
+                            {odd.away_odds ? odd.away_odds.toFixed(2) : 'N/A'}
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Additional info */}
+                      <div style={{
+                        marginTop: '12px',
+                        padding: '8px 12px',
+                        backgroundColor: '#f8fafc',
+                        borderRadius: '8px',
+                        fontSize: '11px',
+                        color: '#64748b',
+                        textAlign: 'center'
+                      }}>
+                        📅 {new Date(odd.commence_time).toLocaleString('es-ES', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <EmptyState
                 title="No hay odds disponibles"
