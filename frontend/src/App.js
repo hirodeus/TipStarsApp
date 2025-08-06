@@ -1039,7 +1039,7 @@ function App() {
             overflowY: 'auto',
             gap: '16px'
           }}>
-            {loading ? (
+         {loading ? (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1068,7 +1068,23 @@ function App() {
                 `}</style>
               </div>
             ) : odds.length > 0 ? (
-              <div>Odds disponibles: {odds.length}</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+            {odds.map((odd, index) => (
+              <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px', backgroundColor: 'white', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                  {odd.home_team} vs {odd.away_team}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+                  Inicio: {new Date(odd.commence_time).toLocaleString()}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', fontSize: '14px', color: '#374151' }}>
+                  <span>Local: {odd.home_odds}</span>
+                  <span>Visitante: {odd.away_odds}</span>
+                  {odd.draw_odds ? <span>Empate: {odd.draw_odds}</span> : null}
+                </div>
+              </div>
+            ))}
+          </div>
             ) : (
               <EmptyState
                 title="No hay odds disponibles"
